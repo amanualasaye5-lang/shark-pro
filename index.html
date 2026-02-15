@@ -29,7 +29,36 @@
             messagingSenderId: "997842284367",
             appId: "1:997842284367:web:d862eb126a2cc711151f3a"
         };
-        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 1. ተጠቃሚውን መለየት (ለእያንዳንዱ ሰው የተለየ ባላንስ እንዲኖረው)
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = urlParams.get('user_id') || "user_" + Math.floor(Math.random() * 1000000);
+        const userRef = database.ref('users/' + userId);
+
+        // 2. ባላንስን ከዳታቤዝ መጫን (ገጹ ሲከፈት የድሮ ብራቸው እንዲመጣ)
+        userRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('balance').innerText = data.balance.toFixed(2) + " ETB";
+            }
+        });
+
+        // 3. ብር ሲቆጠር ወደ Firebase ሴቭ ማድረግ
+        function watchAd() {
+            let current = parseFloat(document.getElementById('balance').innerText);
+            let newBalance = current + 0.50;
+            
+            userRef.set({
+                balance: newBalance
+            }).then(() => {
+                alert("0.50 ETB ተጨምሯል! ባላንስዎ ዳታቤዝ ላይ ተቀምጧል።");
+            });
+        }
+    </script>
+</body>
+</html>
+    firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         // ተጠቃሚውን መለየት
@@ -83,4 +112,5 @@
     </script>
 </body>
 </html>
+
 
