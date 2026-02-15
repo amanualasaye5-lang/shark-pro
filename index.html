@@ -19,7 +19,41 @@
         <div id="balance">0.00 ETB</div>
         <button onclick="watchAd()">ማስታወቂያ እይና ብር አግኝ</button>
     </div>
+<script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6bxJ1d3GwzsSYAQM6YCNIxzHOcvQAHx4",
+            authDomain: "shark-pro-fire.firebaseapp.com",
+            databaseURL: "https://shark-pro-fire-default-rtdb.firebaseio.com",
+            projectId: "shark-pro-fire",
+            storageBucket: "shark-pro-fire.firebasestorage.app",
+            messagingSenderId: "997842284367",
+            appId: "1:997842284367:web:d862eb126a2cc711151f3a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
+        // ተጠቃሚውን መለየት
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = urlParams.get('user_id') || localStorage.getItem('local_user_id') || "user_" + Math.floor(Math.random() * 1000000);
+        localStorage.setItem('local_user_id', userId);
+
+        const userRef = database.ref('users/' + userId);
+
+        // ባላንስን መጫን
+        userRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) document.getElementById('balance').innerText = data.balance.toFixed(2) + " ETB";
+        });
+
+        // ብር ሲቆጠር ሴቭ ማድረግ
+        function watchAd() {
+            let current = parseFloat(document.getElementById('balance').innerText);
+            userRef.set({ balance: current + 0.50 });
+            alert("0.50 ETB ተጨምሯል!");
+        }
+    </script>
+</body>
+</html>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC6bxJ1d3GwzsSYAQM6YCNIxzHOcvQAHx4",
@@ -49,3 +83,4 @@
     </script>
 </body>
 </html>
+
