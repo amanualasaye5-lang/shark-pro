@@ -18,13 +18,13 @@
         .section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-main { background: linear-gradient(135deg, #0077ff, #00d4ff); color: #000; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; }
+        .btn-main { background: linear-gradient(135deg, #0077ff, #00d4ff); color: #000; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 15px; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--primary); }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(11, 14, 17, 0.95); display: flex; padding: 15px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; text-align: center; color: #555; font-size: 12px; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 24px; display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -37,37 +37,33 @@
     <div class="content">
         <div id="home" class="section active">
             <div class="card" style="text-align: center;">
-                <i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary); margin-bottom: 15px;"></i>
-                <h3>Watch & Earn</h3>
-                <p>ማስታወቂያ አይተው 0.50 ETB ያግኙ</p>
-                <button class="btn-main" onclick="watchAd()">WATCH AD & EARN</button>
+                <div class="video-box">
+                    <video id="adVideo" width="100%" height="100%" onended="rewardUser()">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <h3>Watch Video</h3>
+                <p id="statusTxt">ቪዲዮውን እስከመጨረሻው አይተው 0.50 ETB ያግኙ</p>
+                <button id="playBtn" class="btn-main" onclick="startVideo()">PLAY VIDEO</button>
             </div>
         </div>
 
         <div id="wallet" class="section">
             <div class="card">
                 <h3>Withdraw Funds</h3>
-                <div class="input-group">
-                    <label>Method</label>
-                    <select id="wMethod"><option value="Telebirr">Telebirr</option><option value="CBE">CBE</option></select>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="wPhone" placeholder="Phone/Account Number">
-                </div>
-                <div class="input-group">
-                    <input type="number" id="wAmount" placeholder="Amount (Min 25)">
-                </div>
+                <input type="text" id="wPhone" placeholder="Phone/Account Number">
+                <input type="number" id="wAmount" placeholder="Amount (Min 25)">
                 <button class="btn-main" onclick="confirmWithdraw()">CONFIRM WITHDRAW</button>
             </div>
         </div>
 
         <div id="invite" class="section">
             <div class="card" style="text-align: center;">
-                <i class="fas fa-users" style="font-size: 50px; color: var(--primary); margin-bottom: 15px;"></i>
+                <i class="fas fa-user-plus" style="font-size: 50px; color: var(--primary); margin-bottom: 15px;"></i>
                 <h3>Invite Friends</h3>
-                <p>ጓደኞችዎን ይጋብዙ እና ተጨማሪ ያግኙ</p>
-                <div style="background: #000; padding: 10px; border-radius: 10px; font-family: monospace; margin: 15px 0;" id="refLink">t.me/SharkAds_bot?start=user123</div>
-                <button class="btn-main" onclick="copyLink()">COPY INVITE LINK</button>
+                <p>ጓደኛ ሲጋብዙ የ 1.00 ETB ስጦታ ያግኙ</p>
+                <div style="background: #000; padding: 12px; border-radius: 10px; font-family: monospace; font-size: 14px; border: 1px dashed var(--primary);" id="refLink"></div>
+                <button class="btn-main" onclick="copyLink()">COPY & SHARE</button>
             </div>
         </div>
     </div>
@@ -92,9 +88,14 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let userId = new URLSearchParams(window.location.search).get('user_id') || "user_guest";
+        // User Setup
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = urlParams.get('user_id') || "guest_" + Math.floor(Math.random() * 1000);
         const userRef = database.ref('users/' + userId);
         let balance = 0;
+
+        // Set Invite Link
+        document.getElementById('refLink').innerText = "https://t.me/SharkAds_bot?start=" + userId;
 
         userRef.on('value', (s) => {
             if(s.val()) { balance = s.val().balance || 0; document.getElementById('bal').innerText = balance.toFixed(2); }
@@ -105,32 +106,43 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelectorAll('.nav-item')[idx].classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
         }
 
-        function watchAd() {
+        function startVideo() {
+            const vid = document.getElementById('adVideo');
+            vid.play();
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('statusTxt').innerText = "ቪዲዮው እየታየ ነው... አይውጡ!";
+        }
+
+        function rewardUser() {
             balance += 0.50;
             userRef.update({ balance: balance });
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('statusTxt').innerText = "እንኳን ደስ አለዎት! 0.50 ETB ተጨምሯል።";
             tg.showAlert("Success: +0.50 ETB!");
         }
 
         function confirmWithdraw() {
             let amt = parseFloat(document.getElementById('wAmount').value);
             let phone = document.getElementById('wPhone').value;
-            if(amt >= 25 && amt <= balance && phone) {
-                database.ref('withdrawals').push({ userId, amt, phone, method: document.getElementById('wMethod').value, date: new Date().toLocaleString() });
+            if(amt >= 25 && amt <= balance) {
+                database.ref('withdrawals').push({ userId, amt, phone, date: new Date().toLocaleString() });
                 balance -= amt;
                 userRef.update({ balance: balance });
-                tg.showAlert("Withdrawal Request Sent!");
-            } else {
-                tg.showAlert("Invalid details or low balance!");
-            }
+                tg.showAlert("ጥያቄዎ ተልኳል!");
+            } else { tg.showAlert("ስህተት አለ፣ ድጋሚ ይሞክሩ!"); }
         }
 
         function copyLink() {
             const link = document.getElementById('refLink').innerText;
-            navigator.clipboard.writeText(link);
-            tg.showAlert("Link Copied!");
+            const el = document.createElement('textarea');
+            el.value = link;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            tg.showAlert("የግብዣ ሊንክዎ ኮፒ ሆኗል!");
         }
 
         tg.expand();
