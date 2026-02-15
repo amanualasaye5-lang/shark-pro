@@ -325,6 +325,49 @@
         tg.expand();
         tg.backgroundColor = '#05070a';
         tg.headerColor = '#05070a';
+    <script>
+    const tg = window.Telegram.WebApp;
+    
+    // የFirebase መረጃዎችህ
+    const firebaseConfig = {
+        apiKey: "AIzaSyC6bxJ1d3GwzsSYAQM6YCNIxzHOcvQAHx4",
+        authDomain: "shark-pro-fire.firebaseapp.com",
+        databaseURL: "https://shark-pro-fire-default-rtdb.firebaseio.com",
+        projectId: "shark-pro-fire",
+        storageBucket: "shark-pro-fire.firebasestorage.app",
+        messagingSenderId: "997842284367",
+        appId: "1:997842284367:web:d862eb126a2cc711151f3a"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // የተጠቃሚ መለያ
+    const urlParams = new URLSearchParams(window.location.search);
+    let userId = urlParams.get('user_id') || "user_" + Math.floor(Math.random() * 1000000);
+    const userRef = database.ref('users/' + userId);
+
+    let b = 0.00;
+    let adsLeft = 25;
+
+    // ዳታውን ከFirebase መጫን
+    userRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            b = data.balance || 0;
+            document.getElementById('bal').innerText = b.toFixed(2);
+        }
+    });
+
+    // ሌሎቹ የላክሃቸው ፋንክሽኖች (goVid, reward, dailyBonus ወዘተ) እዚህ ይቀጥላሉ...
+    // ለምሳሌ በreward ፋንክሽን ውስጥ ባላንሱን ወደ Firebase መላክን አትርሳ፡
+    function reward(amt) {
+        b += amt; adsLeft--; 
+        userRef.update({ balance: b }); // ዳታውን ሴቭ ያደርጋል
+        updateUI();
+        // ... የቀረው ኮድ
+    }
+</script>
     </script>
 </body>
 </html>
+
