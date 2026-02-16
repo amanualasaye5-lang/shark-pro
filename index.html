@@ -3,85 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shark Pro - English UI</title>
+    <title>Shark Pro - Fixed & Full</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0077ff; --bg: #ffffff; --card: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        :root { --primary: #0077ff; --bg: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         /* Header */
-        .header { padding: 20px; text-align: center; background: linear-gradient(135deg, #0077ff, #00d4ff); color: white; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
+        .header { padding: 20px; text-align: center; background: linear-gradient(135deg, #0077ff, #00d4ff); color: white; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; flex-shrink: 0; }
         .balance-value { font-size: 35px; font-weight: 800; }
 
-        /* Content Area */
-        .main-container { flex: 1; position: relative; overflow: hidden; }
-        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .active-page { display: block !important; }
+        /* Pages Area */
+        .main-container { flex-grow: 1; position: relative; }
+        .page { position: absolute; inset: 0; display: none; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .active-page { display: block !important; z-index: 10; }
 
-        .card { background: var(--card); border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card { background: #f8f9fa; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        .video-box { width: 100%; height: 180px; background: #000; border-radius: 15px; margin-bottom: 15px; overflow: hidden; border: 2px solid var(--primary); }
+        /* Video Box Fix */
+        .video-box { width: 100%; height: 200px; background: #000; border-radius: 15px; margin-bottom: 15px; overflow: hidden; border: 2px solid var(--primary); }
         
-        .btn { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        .btn-action { 
+            background: var(--primary); color: white; border: none; 
+            padding: 16px; width: 100%; border-radius: 12px; 
+            font-weight: bold; font-size: 16px; cursor: pointer;
+            display: block; margin: 10px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        /* Navigation Bar */
-        .nav-bar { height: 75px; background: white; display: flex; border-top: 2px solid #f0f0f0; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+
+        /* Navigation */
+        .nav-bar { height: 75px; background: white; display: flex; border-top: 1px solid #eee; flex-shrink: 0; z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; }
-        .nav-item.active-nav { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        .nav-item.active-nav { color: var(--primary); font-weight: bold; border-top: 3px solid var(--primary); }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div style="font-size: 12px; opacity: 0.9;">TOTAL BALANCE</div>
-        <div class="balance-value"><span id="balance">0.00</span> <small style="font-size:18px;">ETB</small></div>
+        <div class="balance-value"><span id="balance">0.00</span> <small style="font-size:16px;">ETB</small></div>
     </div>
 
     <div class="main-container">
         <div id="earnPage" class="page active-page">
             <div class="card">
                 <div class="video-box">
-                    <video id="movieAd" width="100%" height="100%">
+                    <video id="movieAd" width="100%" height="100%" poster="https://via.placeholder.com/400x200/000?text=Shark+Ads+Video">
                         <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4">
                     </video>
                 </div>
-                <h3>Movie Ads</h3>
-                <p id="status">Watch full video to earn 0.50 ETB</p>
-                <button class="btn" id="adBtn" onclick="playAd()">WATCH AD</button>
+                <h3>Watch & Earn</h3>
+                <p id="status" style="color:#666; font-size: 14px;">Watch the movie trailer to earn 0.50 ETB</p>
+                <button class="btn-action" id="adBtn" onclick="playAd()">WATCH VIDEO</button>
             </div>
         </div>
 
         <div id="walletPage" class="page">
             <div class="card">
-                <i class="fas fa-wallet" style="font-size: 45px; color: #28a745; margin-bottom: 15px;"></i>
+                <i class="fas fa-wallet" style="font-size: 45px; color: #28a745; margin-bottom: 10px;"></i>
                 <h3>Withdraw Funds</h3>
-                <p style="font-size: 12px; color: #666;">Minimum withdrawal: 50 ETB</p>
-                <input type="number" id="amt" placeholder="Amount (e.g. 50)">
-                <input type="text" id="phone" placeholder="Telebirr Phone Number">
-                <button class="btn" style="background: #28a745;" onclick="doWithdraw()">WITHDRAW NOW</button>
+                <p style="font-size: 12px; color: #666;">Minimum withdrawal is 50 ETB</p>
+                <input type="number" id="amt" placeholder="Amount (Min 50)">
+                <input type="text" id="phone" placeholder="Telebirr Number">
+                <button class="btn-action" style="background: #28a745;" onclick="doWithdraw()">WITHDRAW NOW</button>
             </div>
         </div>
 
         <div id="invitePage" class="page">
             <div class="card">
-                <i class="fas fa-user-plus" style="font-size: 45px; color: #ff9800; margin-bottom: 15px;"></i>
+                <i class="fas fa-share-nodes" style="font-size: 45px; color: #ff9800; margin-bottom: 10px;"></i>
                 <h3>Invite Friends</h3>
-                <p>Earn 1.00 ETB per referral</p>
-                <div id="referralLink" style="background: #eef; padding: 15px; border-radius: 10px; margin: 15px 0; font-family: monospace; border: 1px dashed #0077ff; word-break: break-all;">
-                    t.me/SharkAds_bot?start=u123
-                </div>
-                <button class="btn" style="background: #ff9800;" onclick="doCopy()">COPY LINK</button>
+                <p>Get 1.00 ETB for every friend you invite</p>
+                <div id="linkBox" style="background:#fff; padding:15px; border-radius:10px; border:1px dashed var(--primary); margin:15px 0; font-size:13px; word-break:break-all;">t.me/SharkPro2026_bot?start=u123</div>
+                <button class="btn-action" style="background: #ff9800;" onclick="doCopy()">COPY LINK</button>
             </div>
         </div>
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active-nav" id="n1" onclick="tab('earnPage', 'n1')"><i class="fas fa-play-circle"></i><span>Earn</span></div>
+        <div class="nav-item active-nav" id="n1" onclick="tab('earnPage', 'n1')"><i class="fas fa-play"></i><span>Earn</span></div>
         <div class="nav-item" id="n2" onclick="tab('walletPage', 'n2')"><i class="fas fa-wallet"></i><span>Wallet</span></div>
-        <div class="nav-item" id="n3" onclick="tab('invitePage', 'n3')"><i class="fas fa-share-nodes"></i><span>Invite</span></div>
+        <div class="nav-item" id="n3" onclick="tab('invitePage', 'n3')"><i class="fas fa-users"></i><span>Invite</span></div>
     </nav>
 
     <script>
@@ -91,7 +96,6 @@
         function tab(pageId, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-
             document.getElementById(pageId).classList.add('active-page');
             document.getElementById(navId).classList.add('active-nav');
             tg.HapticFeedback.impactOccurred('light');
@@ -101,34 +105,40 @@
             const v = document.getElementById('movieAd');
             const b = document.getElementById('adBtn');
             b.disabled = true;
-            b.innerText = "Watching...";
+            b.innerText = "Video Playing...";
             v.play();
             v.onended = () => {
                 bal += 0.50;
                 document.getElementById('balance').innerText = bal.toFixed(2);
                 b.disabled = false;
-                b.innerText = "WATCH AD";
-                tg.showAlert("Success! 0.50 ETB added to your balance.");
+                b.innerText = "WATCH VIDEO";
+                tg.showAlert("Congratulations! +0.50 ETB added.");
                 v.load();
             };
         }
 
         function doWithdraw() {
-            const a = document.getElementById('amt').value;
-            if(bal < 50) {
-                tg.showAlert("Insufficient balance! Minimum 50 ETB required.");
-            } else if(!a || a < 50) {
-                tg.showAlert("Please enter a valid amount (Min 50).");
+            const amount = document.getElementById('amt').value;
+            if (bal < 50) {
+                tg.showPopup({ message: "Insufficient balance. You need at least 50 ETB." });
+            } else if (!amount || amount < 50) {
+                tg.showPopup({ message: "Please enter a valid amount (Minimum 50)." });
             } else {
-                bal -= parseFloat(a);
+                bal -= parseFloat(amount);
                 document.getElementById('balance').innerText = bal.toFixed(2);
-                tg.showAlert("Withdrawal request sent successfully!");
+                tg.showPopup({ message: "Withdrawal request submitted successfully!" });
             }
         }
 
         function doCopy() {
-            const link = document.getElementById('referralLink').innerText;
-            // ቴሌግራም ላይ ኮፒ ለማድረግ የተሻለው መንገድ
+            const link = document.getElementById('linkBox').innerText;
+            const el = document.createElement('textarea');
+            el.value = link;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
             tg.showAlert("Referral link copied to clipboard!");
             tg.HapticFeedback.notificationOccurred('success');
         }
