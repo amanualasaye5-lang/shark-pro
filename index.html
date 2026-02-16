@@ -1,130 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="am">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shark Pro Final</title>
+    <title>Shark Pro - Fixed</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* 1. ዳራውን ነጭ እና ጽሁፉን ጥቁር ማድረግ */
         body { 
-            background: #ffffff !important; 
+            background-color: #ffffff !important; 
             color: #000000 !important; 
-            font-family: sans-serif; 
-            margin: 0; padding: 0;
-            overflow: hidden;
+            font-family: Arial, sans-serif; 
+            margin: 0; padding: 0; 
+            display: flex; flex-direction: column; height: 100vh;
         }
-        .header { background: #f8f9fa; padding: 20px; text-align: center; border-bottom: 1px solid #ddd; }
+
+        /* 2. Header */
+        .header { 
+            background: #f8f9fa; padding: 20px; text-align: center; 
+            border-bottom: 2px solid #0077ff; 
+        }
         .balance { font-size: 35px; font-weight: bold; color: #0077ff; }
-        
-        /* Pages */
-        .container { padding: 20px; height: calc(100vh - 150px); overflow-y: auto; }
+
+        /* 3. ገጾች (Sections) */
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; }
         .page { display: none; }
         .active { display: block !important; }
 
         .card { 
-            border: 2px solid #f0f0f0; padding: 20px; border-radius: 15px; 
+            border: 1px solid #ddd; padding: 20px; border-radius: 15px; 
             margin-bottom: 20px; text-align: center; background: #fff;
-        }
-        .btn-action { 
-            background: #0077ff; color: white; border: none; padding: 15px; 
-            width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px;
-            cursor: pointer; display: block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* Navigation */
+        /* 4. በተኖች */
+        .btn-main { 
+            background: #0077ff; color: white; border: none; padding: 15px; 
+            width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px;
+            cursor: pointer; margin-top: 10px;
+        }
+
+        /* 5. የግርጌ ማውጫ (Navigation) - ትልቅ እና ግልጽ */
         .nav-bar { 
-            position: fixed; bottom: 0; width: 100%; background: #ffffff; 
-            display: flex; border-top: 2px solid #eee; height: 70px;
-            z-index: 9999; /* ከሁሉም በላይ እንዲሆን */
+            display: flex; background: #ffffff; border-top: 2px solid #eeeeee;
+            height: 70px; z-index: 1000;
         }
-        .nav-btn { 
+        .nav-item { 
             flex: 1; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #666; cursor: pointer; border: none; background: none;
-            font-size: 16px;
+            font-weight: bold; cursor: pointer; border: none; background: none;
+            font-size: 16px; color: #666;
         }
-        .nav-btn.selected { color: #0077ff; background: #f0f7ff; }
-        
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .nav-item.selected { 
+            color: #0077ff; background: #f0f7ff; border-top: 3px solid #0077ff;
+        }
+
+        input { 
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; 
+            border-radius: 8px; box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div style="font-size: 14px; color: #666;">Total Balance</div>
-        <div class="balance"><span id="balDisplay">0.00</span> ETB</div>
+        <div class="balance"><span id="balVal">0.00</span> ETB</div>
     </div>
 
-    <div class="container">
-        <div id="p1" class="page active">
+    <div class="main-content">
+        <div id="earn" class="page active">
             <div class="card">
                 <h3>Earn Money</h3>
-                <p>ቪዲዮ አይተው 0.30 ETB ያግኙ</p>
-                <button class="btn-action" onclick="doEarn()">WATCH VIDEO</button>
+                <p>ማስታወቂያ አይተው 0.30 ETB ያግኙ</p>
+                <div style="height:100px; background:#eee; border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#999;">Video Area</div>
+                <button class="btn-main" onclick="earnMoney()">WATCH VIDEO</button>
             </div>
         </div>
 
-        <div id="p2" class="page">
+        <div id="wallet" class="page">
             <div class="card">
                 <h3>Withdrawal</h3>
-                <input type="number" id="wAmt" placeholder="የብር መጠን (Min 25)">
-                <input type="text" id="wPhone" placeholder="ስልክ ቁጥር">
-                <button class="btn-action" style="background: #28a745;" onclick="doWithdraw()">WITHDRAW NOW</button>
+                <p style="font-size:12px; color:red;">Minimum 25 ETB</p>
+                <input type="number" id="amtInput" placeholder="መጠን (Amount)">
+                <input type="text" id="phoneInput" placeholder="ስልክ ቁጥር">
+                <button class="btn-main" style="background:#28a745;" onclick="withdrawMoney()">WITHDRAW</button>
             </div>
         </div>
 
-        <div id="p3" class="page">
+        <div id="invite" class="page">
             <div class="card">
                 <h3>Invite Friends</h3>
                 <p>ጓደኛ ሲጋብዙ 0.50 ETB ያግኙ</p>
-                <code style="display:block; padding:10px; background:#f4f4f4; margin-bottom:10px;">t.me/SharkAds_bot?start=user123</code>
-                <button class="btn-action" style="background: #ffc107; color: black;" onclick="doCopy()">COPY LINK</button>
+                <div style="background:#f4f4f4; padding:10px; font-family:monospace; margin-bottom:10px; border-radius:5px;">t.me/SharkAds_bot?start=u123</div>
+                <button class="btn-main" style="background:#ffc107; color:black;" onclick="copyLink()">COPY LINK</button>
             </div>
         </div>
     </div>
 
     <div class="nav-bar">
-        <button class="nav-btn selected" id="b1" onclick="tab(1)">Earn</button>
-        <button class="nav-btn" id="b2" onclick="tab(2)">Wallet</button>
-        <button class="nav-btn" id="b3" onclick="tab(3)">Invite</button>
+        <button id="btnEarn" class="nav-item selected" onclick="openPage('earn', 'btnEarn')">Earn</button>
+        <button id="btnWallet" class="nav-item" onclick="openPage('wallet', 'btnWallet')">Wallet</button>
+        <button id="btnInvite" class="nav-item" onclick="openPage('invite', 'btnInvite')">Invite</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        let myBalance = 0.00;
+        let balance = 0.00;
 
-        function tab(num) {
-            // ሁሉንም ገጽ ደብቅ
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // ሁሉንም በተን አቀለም አጥፋ
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('selected'));
+        // ገጽ መቀያየሪያ ፈንክሽን
+        function openPage(pageId, btnId) {
+            // ሁሉንም ገጾች ደብቅ
+            const pages = document.getElementsByClassName('page');
+            for (let i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
+            // ሁሉንም በተኖች ቀለማቸውን አጥፋ
+            const btns = document.getElementsByClassName('nav-item');
+            for (let i = 0; i < btns.length; i++) {
+                btns[i].classList.remove('selected');
+            }
             
-            // የተመረጠውን አሳይ
-            document.getElementById('p' + num).classList.add('active');
-            document.getElementById('b' + num).classList.add('selected');
+            // የተመረጠውን ገጽ እና በተን አሳይ
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById(btnId).classList.add('selected');
             
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        function doEarn() {
-            myBalance += 0.30;
-            document.getElementById('balDisplay').innerText = myBalance.toFixed(2);
-            tg.showAlert("Success: +0.30 ETB!");
+        function earnMoney() {
+            balance += 0.30;
+            document.getElementById('balVal').innerText = balance.toFixed(2);
+            tg.showAlert("Success! +0.30 ETB Added.");
         }
 
-        function doWithdraw() {
-            let val = document.getElementById('wAmt').value;
-            if(myBalance < 25) {
-                tg.showAlert("Minimum 25 ETB ያስፈልጋል!");
-            } else if(!val || val < 25) {
-                tg.showAlert("እባክዎ ትክክለኛ መጠን ያስገቡ!");
+        function withdrawMoney() {
+            let a = document.getElementById('amtInput').value;
+            if(balance < 25) {
+                tg.showAlert("ባላንስዎ ከ 25 ETB በታች ነው!");
+            } else if(!a || a < 25) {
+                tg.showAlert("እባክዎ ቢያንስ 25 ያስገቡ");
             } else {
-                myBalance -= parseFloat(val);
-                document.getElementById('balDisplay').innerText = myBalance.toFixed(2);
+                balance -= parseFloat(a);
+                document.getElementById('balVal').innerText = balance.toFixed(2);
                 tg.showAlert("ጥያቄዎ ተልኳል!");
             }
         }
 
-        function doCopy() {
+        function copyLink() {
             tg.showAlert("Link Copied!");
         }
 
