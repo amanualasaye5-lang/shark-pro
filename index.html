@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shark Pro - Fixed Video</title>
+    <title>Shark Pro - Trailer Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #0077ff; --bg: #ffffff; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
+        /* Header */
         .header { padding: 20px; text-align: center; background: linear-gradient(135deg, #0077ff, #00d4ff); color: white; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; flex-shrink: 0; }
         .balance-value { font-size: 35px; font-weight: 800; }
 
+        /* Main Container */
         .main-container { flex-grow: 1; position: relative; }
         .page { position: absolute; inset: 0; display: none; padding: 20px; overflow-y: auto; box-sizing: border-box; }
         .active-page { display: block !important; z-index: 10; }
 
         .card { background: #f8f9fa; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        /* ቪዲዮው እንዲታይ የተደረገ ማስተካከያ */
-        .video-box { width: 100%; height: 200px; background: #000; border-radius: 15px; margin-bottom: 15px; overflow: hidden; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; }
+        /* Trailer Box */
+        .video-box { width: 100%; height: 210px; background: #000; border-radius: 15px; margin-bottom: 15px; overflow: hidden; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; }
         
         .btn-action { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; display: block; margin: 10px 0; }
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
 
+        /* Navigation Bar */
         .nav-bar { height: 75px; background: white; display: flex; border-top: 1px solid #eee; flex-shrink: 0; z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; }
-        .nav-item.active-nav { color: var(--primary); font-weight: bold; }
+        .nav-item.active-nav { color: var(--primary); font-weight: bold; border-top: 3px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -41,13 +44,13 @@
         <div id="earnPage" class="page active-page">
             <div class="card">
                 <div class="video-box">
-                    <video id="movieAd" width="100%" height="100%" poster="https://via.placeholder.com/400x200/000?text=Shark+Ads+Video">
+                    <video id="movieTrailer" width="100%" height="100%" poster="https://media.w3.org/2010/05/sintel/poster.png">
                         <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4">
                     </video>
                 </div>
-                <h3>Watch & Earn</h3>
-                <p id="status" style="color:#666; font-size: 14px;">Watch the video to earn 0.50 ETB</p>
-                <button class="btn-action" id="adBtn" onclick="playAd()">WATCH VIDEO</button>
+                <h3>Movie Trailer</h3>
+                <p id="status" style="color:#666; font-size: 14px;">Watch the full trailer to earn 0.50 ETB</p>
+                <button class="btn-action" id="adBtn" onclick="playTrailer()">PLAY TRAILER</button>
             </div>
         </div>
 
@@ -63,7 +66,7 @@
 
         <div id="invitePage" class="page">
             <div class="card">
-                <i class="fas fa-users" style="font-size: 40px; color: #ff9800; margin-bottom: 10px;"></i>
+                <i class="fas fa-share-nodes" style="font-size: 40px; color: #ff9800; margin-bottom: 10px;"></i>
                 <h3>Invite Friends</h3>
                 <div id="linkBox" style="background:#fff; padding:15px; border-radius:10px; border:1px dashed #ccc; margin:15px 0; font-size:13px; word-break:break-all;">t.me/SharkPro2026_bot?start=u123</div>
                 <button class="btn-action" style="background: #ff9800;" onclick="doCopy()">COPY LINK</button>
@@ -72,47 +75,48 @@
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active-nav" onclick="tab('earnPage', this)"><i class="fas fa-play"></i><span>Earn</span></div>
-        <div class="nav-item" onclick="tab('walletPage', this)"><i class="fas fa-wallet"></i><span>Wallet</span></div>
-        <div class="nav-item" onclick="tab('invitePage', this)"><i class="fas fa-share-nodes"></i><span>Invite</span></div>
+        <div class="nav-item active-nav" id="n1" onclick="tab('earnPage', 'n1')"><i class="fas fa-play"></i><span>Earn</span></div>
+        <div class="nav-item" id="n2" onclick="tab('walletPage', 'n2')"><i class="fas fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item" id="n3" onclick="tab('invitePage', 'n3')"><i class="fas fa-users"></i><span>Invite</span></div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         let bal = 0.00;
 
-        function tab(pageId, el) {
+        function tab(pageId, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
             document.getElementById(pageId).classList.add('active-page');
-            el.classList.add('active-nav');
+            document.getElementById(navId).classList.add('active-nav');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        function playAd() {
-            const v = document.getElementById('movieAd');
+        function playTrailer() {
+            const v = document.getElementById('movieTrailer');
             const b = document.getElementById('adBtn');
             b.disabled = true;
-            b.innerText = "Watching...";
-            v.play().catch(() => tg.showAlert("Video failed to load. Check internet."));
+            b.innerText = "Playing Trailer...";
+            v.play().catch(() => tg.showAlert("Failed to load trailer. Check your connection."));
             
             v.onended = () => {
                 bal += 0.50;
                 document.getElementById('balance').innerText = bal.toFixed(2);
                 b.disabled = false;
-                b.innerText = "WATCH VIDEO";
-                tg.showAlert("Success! 0.50 ETB added.");
+                b.innerText = "PLAY TRAILER";
+                tg.showAlert("Success! You earned 0.50 ETB from the trailer.");
                 v.load();
             };
         }
 
         function doWithdraw() {
             const a = document.getElementById('amt').value;
-            if (bal < 50) tg.showPopup({ message: "Insufficient balance (Min 50)." });
-            else if (!a || a < 50) tg.showPopup({ message: "Min 50 ETB." });
+            if (bal < 50) tg.showPopup({ message: "Insufficient balance. (Min 50 ETB)" });
+            else if (!a || a < 50) tg.showPopup({ message: "Minimum withdrawal is 50 ETB." });
             else {
                 bal -= parseFloat(a);
                 document.getElementById('balance').innerText = bal.toFixed(2);
-                tg.showPopup({ message: "Request sent!" });
+                tg.showPopup({ message: "Withdrawal request submitted!" });
             }
         }
 
@@ -124,7 +128,8 @@
             temp.select();
             document.execCommand('copy');
             document.body.removeChild(temp);
-            tg.showAlert("Link copied!");
+            tg.showAlert("Link copied to clipboard!");
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
         tg.expand();
